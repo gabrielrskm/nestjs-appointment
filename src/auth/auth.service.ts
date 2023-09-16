@@ -49,9 +49,9 @@ export class AuthService {
 
       const message = `
       <h1>Verify your email</h1>
-      <a href="http://localhost:3000/auth/verify?token=${token}">Click here to verify your email</a>
+      <a href="http://localhost:3000/auth/verify?email=${res.email}&token=${token}">Click here to verify your email</a>
       `
-      this.verifyEmail(res.email,token,message);
+      this.sendVerifyEmail(res.email,token,message);
       return data;
    }
 
@@ -71,18 +71,21 @@ export class AuthService {
       
    }
 
-  
-
-   async verify(email : string, token : string) {
-      
+   async verifyToken(email : string, token : string) {
+      try {
+         const payload = await this.jwtService.verifyAsync(token, { secret: process.env.JWT_SECRET });
+         return true;
+      }
+      catch {
+         return false;
+       }
    }
-
 
    async forgetPassword(email : string) {
       return 'resizeBy';
    }
 
-   private async verifyEmail(email : string, token : string,message: string) {
+   private async sendVerifyEmail(email : string, token : string,message: string) {
       const transporter = nodemailer.createTransport({
          host: "smtp.gmail.com",
          port: 465,
@@ -110,5 +113,9 @@ export class AuthService {
       }
 
 
+   }
+
+   async linkVerifyEmail(email : string, token : string,message: string) {
+      
    }
 }

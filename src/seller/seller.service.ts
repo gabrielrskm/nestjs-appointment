@@ -7,6 +7,8 @@ import { $Enums } from '@prisma/client';
 export class SellerService {
 
    constructor(private prismaService : PrismaService) {
+
+      
       
    }
 
@@ -38,6 +40,6 @@ export class SellerService {
          }
       })
 
-      return result
+      return result;
    }
 }
