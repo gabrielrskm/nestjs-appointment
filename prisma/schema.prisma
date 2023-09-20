@@ -23,6 +23,7 @@ model User {
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
     email       String  @unique
+    role        Role
     security    Security
     profile     Profile?
     appointment Appointment[]
@@ -62,8 +63,6 @@ model User {
 
   type Security {
     hash        String?
-    jwt         String?
-    verifyqued  Boolean @default(true)
     provider    Provider?
   }
 
@@ -72,5 +71,11 @@ model User {
     FACEBOOK
     TWITTER
     GITHUB
+  }
+
+  enum Role {
+    USER
+    USERVERYFY
+    SELLER
   }
   

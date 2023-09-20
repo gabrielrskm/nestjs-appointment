@@ -3,9 +3,12 @@ import { createAppointmentDto } from './dto/create-appointment.dto';
 import { SellerService } from './seller.service';
 import { JwtService } from '@nestjs/jwt';
 import { RequestOptions } from 'http';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @UseGuards(AuthGuard)
+@ApiBearerAuth()
+@ApiTags('Seller')
 @Controller('seller')
 export class SellerController {
 

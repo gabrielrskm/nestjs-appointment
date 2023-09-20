@@ -1,6 +1,6 @@
 import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { CreateUserWithPasswordDto, CreateUserWithProviderDto } from './dto/create-user.dto';
-import { SigninWithPasswordDto, SigninWithProviderDto } from './dto/sigin-user.dto';
+import { LoginWithPasswordDto, SigninWithProviderDto } from './dto/sigin-user.dto';
 import { PrismaService } from 'src/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt/dist/jwt.service';
@@ -13,16 +13,15 @@ export class AuthService {
                private jwtService : JwtService) { }
    
 
-   async login(user: SigninWithPasswordDto) : Promise< object > {
+   async login(user: LoginWithPasswordDto) : Promise< object > {
       const userData = await this.prismaService.user.findUnique({
          where: { email: user.email }
       })
       if (!userData) throw new NotFoundException('User not found', '404');
       const isMatch = await bcrypt.compare(user.password, userData.security.hash);
       if (!isMatch) throw new UnauthorizedException('Invalid password', '401');
-      const token = await this.jwtService.signAsync({ id: userData.id, email: userData.email });
-      const data = { token, user: userData.email, userId: userData.id };
-      return data;
+      const token = await this.jwtService.signAsync({ id: userData.id, email: userData.email,role: userData.role });
+      return {token, user: userData.email, userId: userData.id, role: userData.role};
    }
 
    async register(user: CreateUserWithPasswordDto) {
@@ -32,26 +31,29 @@ export class AuthService {
          res = await this.prismaService.user.create({
             data: {
                email: user.email,
-               security: {hash: password,verifyqued: false},
+               security: {hash: password},
                profile: { 
                   firstName: user.firstName,
                   lastName: user.lastName,
                   profilePicture: user.profilePicture,
-               }
+               },
+               role : 'USER'
             }
          })
       }
       catch (e) {
          throw new ConflictException('User already exists', '409');
       }
-      const token = await this.jwtService.signAsync({ id: res.id, email: res.email });
-      const data = { token, user: res.email, userId: res.id };
+      const tokenEmail = await this.jwtService.signAsync({ id: res.id, email: res.email, role: 'USERVERYFY' });
 
       const message = `
       <h1>Verify your email</h1>
-      <a href="http://localhost:3000/auth/verify?email=${res.email}&token=${token}">Click here to verify your email</a>
+      <a href="http://localhost:3000/auth/confirm-email?code=${tokenEmail}">Click here to verify your email</a>
       `
-      this.sendVerifyEmail(res.email,token,message);
+      this.sendVerifyEmail(res.email, message);
+      const token = await this.jwtService.signAsync({ id: res.id, email: res.email, role: res.role });
+      const data = { tokenEmail, user: res.email, userId: res.id };
+
       return data;
    }
 
@@ -71,21 +73,33 @@ export class AuthService {
       
    }
 
-   async verifyToken(email : string, token : string) {
+   async verifyToken(token : string) {
       try {
-         const payload = await this.jwtService.verifyAsync(token, { secret: process.env.JWT_SECRET });
-         return true;
+         const payload: any = this.jwtService.decode(token);
+         console.log(payload);
+         await this.jwtService.verifyAsync(token, { secret: enviroment.JWT_SECRET });
+         return payload.id;
       }
       catch {
-         return false;
+         return null;
        }
    }
 
-   async forgetPassword(email : string) {
-      return 'resizeBy';
+   async forgetPassword(email: string) {
+      const userData = await this.prismaService.user.findUnique({
+         where: { email:email }
+      })
+      if (!userData) throw new NotFoundException('User not found', '404');
+      const token = await this.jwtService.signAsync({ id: userData.id, email: userData.email, role: userData.role });
+      const message = `
+      <h1>Click here to login via email, and then change your password</h1>
+      <a href="http://localhost:3000/auth/confirm-forget-password?code=${token}">Click here to verify your email</a>
+      `
+      await this.sendVerifyEmail(userData.email, message);
+      return
    }
 
-   private async sendVerifyEmail(email : string, token : string,message: string) {
+   private async sendVerifyEmail(email : string, message : string) {
       const transporter = nodemailer.createTransport({
          host: "smtp.gmail.com",
          port: 465,
@@ -115,7 +129,34 @@ export class AuthService {
 
    }
 
-   async linkVerifyEmail(email : string, token : string,message: string) {
+   async resendEmailVerification(email: string) {
+      const res = await this.prismaService.user.findUnique({
+         where: { email: email }
+      });
+      const token = await this.jwtService.signAsync({ id: res.id, email: res.email });
+      const data = { token, user: res.email, userId: res.id };
+
+      const message = `
+      <h1>Verify your email</h1>
+      <a href="http://localhost:3000/auth/confirm-email?email=${res.email}&token=${token}">Click here to verify your email</a>
+      `
+      this.sendVerifyEmail(res.email,message);
+      return data;
+   }
+
+   async confirmMail (id : string) {
+      const userData = await this.prismaService.user.findUnique({
+         where: { id: id }
+      })
+      await this.prismaService.user.update({
+         where: { id: userData.id },
+         data: {
+            role: 'USERVERYFY'
+         }
+      });
+      const token = await this.jwtService.signAsync({ id: userData.id, email: userData.email, role : userData.role });
+      return token;
+
       
    }
 }
