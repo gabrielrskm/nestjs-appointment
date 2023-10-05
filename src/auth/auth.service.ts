@@ -1,11 +1,12 @@
 import { ConflictException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { CreateUserWithPasswordDto, CreateUserWithProviderDto } from './dto/create-user.dto';
 import { LoginWithPasswordDto, SigninWithProviderDto } from './dto/sigin-user.dto';
-import { PrismaService } from 'src/prisma.service';
+import { PrismaService } from '../prisma.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt/dist/jwt.service';
 import * as nodemailer from 'nodemailer';
-import { enviroment } from 'src/constants/constant';
+import { enviroment } from '../common/constants/constant';
+import { Role } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -37,7 +38,7 @@ export class AuthService {
                   lastName: user.lastName,
                   profilePicture: user.profilePicture,
                },
-               role : 'USER'
+               role : Role.USER
             }
          })
       }

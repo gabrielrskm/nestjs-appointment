@@ -1,9 +1,14 @@
-import { IsBoolean, IsDate, IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString,IsDateString } from "class-validator";
+import { IsBoolean, IsNotEmpty, IsNumber, IsString, IsDateString, IsEnum } from "class-validator";
+
+export enum Status { 
+   RESERVE = 'RESERVE', 
+   AVAILABLE = 'AVAILABLE',
+   CANCELED = 'CANCELED', 
+   SUCCESS = 'SUCCESS',  
+   EXPIRED = 'EXPIRED',  
+}
 
 export class createAppointmentDto{
-   @IsEmail()
-   @IsNotEmpty()
-   emailSeller: string;
    @IsString()
    @IsNotEmpty()
    title: string;
@@ -18,18 +23,5 @@ export class createAppointmentDto{
    @IsNotEmpty()
    published: boolean;
    @IsNotEmpty()
-   status: Status
-   @IsOptional()
-   @IsString()
-   userId?: string;
-   
+   status: Status; // Cambiado el tipo a string
 }
-
-export enum Status { 
-   
-   'RESERVE',
-   'AVIABLE',
-   'CANCELED',
-   'SUCCESS',
-   'EXPIRED',
- }

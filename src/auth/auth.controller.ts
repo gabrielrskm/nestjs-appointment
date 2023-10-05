@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Query, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, BadRequestException,HttpCode } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginWithPasswordDto } from './dto/sigin-user.dto';
 import { CreateUserWithPasswordDto } from './dto/create-user.dto';
@@ -16,6 +16,7 @@ export class AuthController {
       return res;
    }
 
+   @HttpCode(200)
    @Post('login')
    async login(@Body() data: LoginWithPasswordDto) : Promise< object > {
       const userData = await this.authService.login(data);
@@ -38,6 +39,7 @@ export class AuthController {
    async forgetPassword(@Body() email: string) {
       console.log(email)
       const res = await this.authService.forgetPassword(email);
+      
       return res;
    }
 

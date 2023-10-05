@@ -1,13 +1,14 @@
-import { Controller, Post,Body,BadRequestException, Get, Request , Req, Param, UseGuards} from '@nestjs/common';
+import { Controller, Post,Body, Get , Req} from '@nestjs/common';
 import { createAppointmentDto } from './dto/create-appointment.dto';
 import { SellerService } from './seller.service';
 import { JwtService } from '@nestjs/jwt';
 import { RequestOptions } from 'http';
-import { AuthGuard } from 'src/auth/guards/auth.guard';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 
-@UseGuards(AuthGuard)
-@ApiBearerAuth()
+import { Role } from '../common/decorator/role.enum';
+import { Auth } from '../auth/decorator/auth.decorator';
+
+@Auth(Role.SELLER)
 @ApiTags('Seller')
 @Controller('seller')
 export class SellerController {
@@ -18,12 +19,8 @@ export class SellerController {
    }
 
    @Post('create-appointment')
-   async createAppointment(@Body() value: createAppointmentDto) {
-      
-      const date = new Date(value.date);
-      console.log(date)
-      if(date.toString()  === 'Invalid Date') throw new BadRequestException('Invalid date format', '400');
-      const res = await this.sellerService.createAppointment(value, date);
+   async createAppointment(@Body() value: createAppointmentDto, @Req() obj: RequestWithUser) {
+     const res = await this.sellerService.createAppointment(obj.user.id, value);
       return res
    }
 

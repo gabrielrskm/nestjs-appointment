@@ -1,0 +1,17 @@
+<diagram program="umletino" version="15.1"><zoom_level>11</zoom_level><help_text>Space for diagram notes</help_text><element><id>UMLActor</id><coordinates><x>22</x><y>198</y><w>66</w><h>121</h></coordinates><panel_attributes>Actor</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLUseCase</id><coordinates><x>121</x><y>220</y><w>143</w><h>66</h></coordinates><panel_attributes>ver todos los turnos
+bg=red</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLUseCase</id><coordinates><x>297</x><y>220</y><w>198</w><h>66</h></coordinates><panel_attributes>getAllturnsByTag(tag:string)
+bg=blue
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLUseCase</id><coordinates><x>572</x><y>209</y><w>143</w><h>77</h></coordinates><panel_attributes>lt=.
+getTurn(tag:string)
+fg=red
+bg=yellow</panel_attributes><additional_attributes></additional_attributes></element><element><id>Text</id><coordinates><x>759</x><y>165</y><w>77</w><h>66</h></coordinates><panel_attributes>customelement=
+// Text Elemnt
+// DB Symbol
+drawArc(0,0,width,height*2/5,0,180,true) fg=black bg=#222222 //Parameters (x, y, width, height, start, extent, open)
+drawArc(0,0,width,height*2/5,180,180,true) fg=black //Parameters (x, y, width, height, start, extent, open)
+drawRectangle(0,(height+0.5)/5,width,(height)*3/5-1) fg=#929292 bg=#222222 //Parameters (x, y, width, height)
+drawLine(0,height/5,0,height*4/5)fg=black //Parameters (x1, y1, x2, y2) 
+drawLine(width,height/5,width,height*4/5)fg=black //Parameters (x1, y1, x2, y2) 
+drawArc(0,height*1/5,width,height*2/5,180,180,true) fg=black //Parameters (x, y, width, height, start, extent, open)
+drawArc(0,height*2/5,width,height*2/5,180,180,true) fg=black //Parameters (x, y, width, height, start, extent, open)
+drawArc(0,height*3/5,width,height*2/5,180,180,true) fg=black bg=#222222 //Parameters (x, y, width, height, start, extent, open)</panel_attributes><additional_attributes></additional_attributes></element></diagram>

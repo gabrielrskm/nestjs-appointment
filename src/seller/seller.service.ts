@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { createAppointmentDto } from './dto/create-appointment.dto';
-import { PrismaService } from 'src/prisma.service';
+import { PrismaService } from '../prisma.service';
 import { $Enums } from '@prisma/client';
 
 @Injectable()
@@ -12,11 +12,15 @@ export class SellerService {
       
    }
 
-   async createAppointment(value: createAppointmentDto, date: Date) {
+   async createAppointment(id: string, value: createAppointmentDto) {
+
+      const date = new Date(value.date);
+      console.log(date)
+      if(date.toString()  === 'Invalid Date') throw new BadRequestException('Invalid date format', '400');
 
       const seller = await this.prismaService.user.findUnique({
          where: {
-            email: value.emailSeller
+            id: id
          }
       })
       const result = await this.prismaService.appointment.create({

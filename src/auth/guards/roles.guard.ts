@@ -1,7 +1,8 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Observable } from 'rxjs';
-import { ROLES_KEY } from 'src/common/decorator/role.decorator';
+import { ROLES_KEY } from '../../common/decorator/role.decorator';
+import { RolePriority } from '../../common/decorator/role.enum';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -10,13 +11,14 @@ export class RolesGuard implements CanActivate {
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
-    const role = this.reflector.getAllAndOverride(ROLES_KEY, [
+    const roleEndpoint = this.reflector.getAllAndOverride(ROLES_KEY, [
       context.getHandler(),
       context.getClass(),
     ]);
-    if (!role) return true;
-    const user  = context.switchToHttp().getRequest().user;
-    return user.role === role;
-    return true;
+    if (!roleEndpoint) return false;
+    const roleParam = context.switchToHttp().getRequest().user.role;
+
+    const [a, b] = [RolePriority[roleEndpoint], RolePriority[roleParam]];
+    return a <= b? true : false;
   }
 }

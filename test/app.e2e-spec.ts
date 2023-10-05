@@ -15,10 +15,28 @@ describe('AppController (e2e)', () => {
     await app.init();
   });
 
-  it('/ (GET)', () => {
-    return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
-  });
+  describe('login and get user', () => { 
+    let token: string;
+    it('login with user valid and previously created', () => {
+      return request(app.getHttpServer())
+        .post('/auth/login')
+        .send({ email: 'gabriel.rskm@gmail.com', password: 'pass123' })
+        .expect(200)
+        .expect((res: any) => {
+          expect(res.body).toHaveProperty('token');
+          token = res.body.token;
+        });
+    });
+
+    it('get user info with token', () => {
+      
+      return request(app.getHttpServer())
+        .get('/user/')
+        .set('Authorization', `Bearer ${token}`)
+        .expect(200)
+        .expect((res: Response) => {
+          expect(res.body).toHaveProperty('email');
+        })
+    })
+  })
 });
